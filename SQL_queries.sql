@@ -1,11 +1,20 @@
 USE TestDb
 
--- 1. Сотрудник с максимальной заработной платой.
+-- 1. Г‘Г®ГІГ°ГіГ¤Г­ГЁГЄ Г± Г¬Г ГЄГ±ГЁГ¬Г Г«ГјГ­Г®Г© Г§Г Г°Г ГЎГ®ГІГ­Г®Г© ГЇГ«Г ГІГ®Г©.
 SELECT [name], salary 
 FROM Employees 
 WHERE salary = (SELECT max(salary) FROM Employees);
 
--- 2. Отдел, с самой высокой заработной платой между сотрудниками.
+-- 2. ГЋГІГ¤ГҐГ«, Г± Г±Г Г¬Г®Г© ГўГ»Г±Г®ГЄГ®Г© Г§Г Г°Г ГЎГ®ГІГ­Г®Г© ГЇГ«Г ГІГ®Г© Г¬ГҐГ¦Г¤Гі Г±Г®ГІГ°ГіГ¤Г­ГЁГЄГ Г¬ГЁ.
+WITH department_salary  AS
+	(SELECT department_id, MAX(salary) as salary 
+	FROM dbo.EMPLOYEE 
+	GROUP BY department_id)
+SELECT [id], [name] FROM dbo.DEPARTMENT
+WHERE [id] = (SELECT department_id FROM department_salary 
+WHERE department_salary.salary = (SELECT MAX(salary) FROM department_salary ));
+
+-- 3. ГЋГІГ¤ГҐГ«, Г± Г¬Г ГЄГ±ГЁГ¬Г Г«ГјГ­Г®Г© Г±ГіГ¬Г¬Г Г°Г­Г®Г© Г§Г Г°ГЇГ«Г ГІГ®Г© Г±Г®ГІГ°ГіГ¤Г­ГЁГЄГ®Гў. 
 WITH department_salary AS
 	(SELECT department_id, SUM(salary) as salary 
 	FROM dbo.Employees
@@ -18,20 +27,7 @@ WHERE ID =
 	WHERE department_salary.salary =
 	(SELECT MAX(salary) FROM department_salary));
 
--- 3. Отдел, с максимальной суммарной зарплатой сотрудников. 
-WITH department_salary AS
-	(SELECT department_id, SUM(salary) as salary 
-	FROM dbo.Employees
-	GROUP BY department_id)
-SELECT ID, [name] 
-FROM Department
-WHERE ID = 
-	(SELECT department_id
-	FROM department_salary
-	WHERE department_salary.salary =
-	(SELECT MAX(salary) FROM department_salary));
-
--- 4. Сотрудника, чье имя начинается на «Р» и заканчивается на «н».
+-- 4. Г‘Г®ГІГ°ГіГ¤Г­ГЁГЄГ , Г·ГјГҐ ГЁГ¬Гї Г­Г Г·ГЁГ­Г ГҐГІГ±Гї Г­Г  В«ГђВ» ГЁ Г§Г ГЄГ Г­Г·ГЁГўГ ГҐГІГ±Гї Г­Г  В«Г­В».
 SELECT [name]
 FROM Employees
-WHERE [name] like 'Р%н'
+WHERE [name] like 'Гђ%Г­'
